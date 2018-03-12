@@ -37,7 +37,7 @@ entity top is
 end top;
 
 architecture rtl of top is
-
+	signal dir_color : std_logic_vector(23 downto 0);
   constant RES_NUM : natural := 6;
 
   type t_param_array is array (0 to RES_NUM-1) of natural;
@@ -54,8 +54,8 @@ architecture rtl of top is
 
   component vga_top is 
     generic (
-      H_RES                : natural := 640;
-      V_RES                : natural := 480;
+      H_RES                : natural := 1280;
+      V_RES                : natural := 1024;
       MEM_ADDR_WIDTH       : natural := 32;
       GRAPH_MEM_ADDR_WIDTH : natural := 32;
       TEXT_MEM_DATA_WIDTH  : natural := 32;
@@ -168,8 +168,8 @@ begin
   graphics_lenght <= conv_std_logic_vector(MEM_SIZE*8*8, GRAPH_MEM_ADDR_WIDTH);
   
   -- removed to inputs pin
-  direct_mode <= '1';
-  display_mode     <= "10";  -- 01 - text mode, 10 - graphics mode, 11 - text & graphics
+  direct_mode <= '0';
+  display_mode     <= "01";  -- 01 - text mode, 10 - graphics mode, 11 - text & graphics
   
   font_size        <= x"1";
   show_frame       <= '1';
@@ -251,15 +251,63 @@ begin
   --dir_green
   --dir_blue
  
+ --dir_color<=X"ffffff" when (dir_pixel_column >= 0) and (dir_pixel_row < 80) else  
+--				 X"dbc415" when (dir_pixel_column >= 80) and (dir_pixel_row < 160) else  
+--			    X"1281bc" when (dir_pixel_column >=160 ) and (dir_pixel_column < 240)else
+--			    X"11bc2b" when (dir_pixel_column > 240) and (dir_pixel_column < 320)else
+--			    X"bc11ad" when (dir_pixel_column >= 320) and (dir_pixel_column < 400)else
+--			    X"fc0c0c" when (dir_pixel_column >= 400) and (dir_pixel_column < 480)else 
+--				 X"0f36c1" when (dir_pixel_column >= 480) and (dir_pixel_column < 560)else
+--				 X"000000" when (dir_pixel_column >=560) and (dir_pixel_column < 640);			  
+--dir_red <= dir_color(23 downto 16);
+--dir_green <= dir_color(15 downto 8);
+--dir_blue <= dir_color(7 downto 0);
+
+
   -- koristeci signale realizovati logiku koja pise po TXT_MEM
   --char_address
   --char_value
   --char_we
+  
+   char_we<= '1';
+	
+	char_address<= 
+						conv_std_logic_vector(0,MEM_ADDR_WIDTH) when (dir_pixel_column>0 and dir_pixel_column<=7) and dir_pixel_row=50 else
+					   conv_std_logic_vector(1,MEM_ADDR_WIDTH) when (dir_pixel_column>7 and dir_pixel_column<=15) and dir_pixel_row=50 else
+					   conv_std_logic_vector(2,MEM_ADDR_WIDTH) when (dir_pixel_column>15 and dir_pixel_column<=23) and dir_pixel_row=50 else
+					   conv_std_logic_vector(3,MEM_ADDR_WIDTH) when (dir_pixel_column>23 and dir_pixel_column<=31) and dir_pixel_row=50 else
+					   conv_std_logic_vector(4,MEM_ADDR_WIDTH) when (dir_pixel_column>31 and dir_pixel_column<=39) and dir_pixel_row=50 else
+					   conv_std_logic_vector(5,MEM_ADDR_WIDTH) when (dir_pixel_column>39 and dir_pixel_column<=47) and dir_pixel_row=50 else
+					   conv_std_logic_vector(6,MEM_ADDR_WIDTH) when (dir_pixel_column>47 and dir_pixel_column<=55) and dir_pixel_row=50 else
+					   conv_std_logic_vector(7,MEM_ADDR_WIDTH) when (dir_pixel_column>55 and dir_pixel_column<=63) and dir_pixel_row=50 else
+					   conv_std_logic_vector(8,MEM_ADDR_WIDTH) when (dir_pixel_column>63 and dir_pixel_column<=71) and dir_pixel_row=50 else
+					   conv_std_logic_vector(9,MEM_ADDR_WIDTH) when (dir_pixel_column>71 and dir_pixel_column<=79) and dir_pixel_row=50 ;
+					  
+	char_value <="00"& x"4" when char_address = conv_std_logic_vector(0,MEM_ADDR_WIDTH) else
+					"00"& x"5" when char_address = conv_std_logic_vector(1,MEM_ADDR_WIDTH) else
+					"01"& x"2" when char_address = conv_std_logic_vector(2,MEM_ADDR_WIDTH) else
+					"01"& x"4"when char_address = conv_std_logic_vector(3,MEM_ADDR_WIDTH) else
+					"00"& x"8" when char_address = conv_std_logic_vector(4,MEM_ADDR_WIDTH) else
+					"00"& x"7" when char_address = conv_std_logic_vector(5,MEM_ADDR_WIDTH) else
+					"01"& x"2" when char_address = conv_std_logic_vector(6,MEM_ADDR_WIDTH) else
+					"00"& x"9" when char_address = conv_std_logic_vector(7,MEM_ADDR_WIDTH) else
+					"01"& x"3" when char_address = conv_std_logic_vector(8,MEM_ADDR_WIDTH) else
+					"01"& x"3" when char_address = conv_std_logic_vector(9,MEM_ADDR_WIDTH) ;									  
+					  
+					  
+													
+  
+  
   
   -- koristeci signale realizovati logiku koja pise po GRAPH_MEM
   --pixel_address
   --pixel_value
   --pixel_we
   
+
+
+
+
+
   
 end rtl;
